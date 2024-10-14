@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas Graph</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+        font-family: sans-serif;
+      }
+      canvas {
+        border: 1px solid black;
+      }
+      button {
+        margin-top: 20px;
+      }
+      h1 {
+        margin-bottom: 20px;
+        font-size: 24px;
+      }
+      .info-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: black;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-style: italic;
+        cursor: pointer;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="info-button" id="infoButton">i</div>
+    <div id="infoModal" class="modal">
+      <div class="modal-content">
+        <p>Plotline Generator</p>
+        <p>by <a href="https://benjifriedman.com">Benji Friedman</a></p>
+        <p>
+          Inspired by Kurt Vonnegut's
+          <a href="https://www.youtube.com/watch?v=oP3c1h8v2ZQ"
+            >Shape of Stories</a
+          >
+          concept
+        </p>
+      </div>
+    </div>
+
+    <h1>Plotline Generator</h1>
+    <canvas id="graphCanvas"></canvas>
+    <button id="newPlotlineButton">New Plotline</button>
+
+    <script>
+      const canvas = document.getElementById("graphCanvas");
+      canvas.width = 800;
+      canvas.height = 600;
+      const ctx = canvas.getContext("2d");
+      const yLabels = [
+        "Very Good",
+        "Fairly Good",
+        "Neutral",
+        "Slightly Bad",
+        "Very Bad",
+      ];
+      const yLabelPositions = [100, 200, 300, 400, 500];
+
+      function drawGraph() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawAxes();
+        drawPlotline();
+      }
+
+      function drawAxes() {
+        // Draw y-axis labels
+        ctx.font = "16px Arial";
+        ctx.textAlign = "right";
+        yLabels.forEach((label, index) => {
+          ctx.fillText(label, 90, yLabelPositions[index]);
+        });
+
+        // Draw x-axis
+        ctx.beginPath();
+        ctx.moveTo(110, 550);
+        ctx.lineTo(750, 550);
+        ctx.strokeStyle = "black"; // Set line color to black
+        ctx.lineWidth = 1; // Set line width to 1 pixel
+        ctx.stroke();
+
+        // Draw y-axis
+        ctx.beginPath();
+        ctx.moveTo(110, 50);
+        ctx.lineTo(110, 550);
+        ctx.strokeStyle = "black"; // Set line color to black
+        ctx.lineWidth = 1; // Set line width to 1 pixel
+        ctx.stroke();
+
+        // Draw x-axis labels
+        ctx.textAlign = "center";
+        const xLabels = ["Beginning", "Middle", "Ending"];
+        const xLabelPositions = [140, 410, 720];
+        xLabels.forEach((label, index) => {
+          ctx.fillText(label, xLabelPositions[index], 580);
+        });
+      }
+
+      function drawPlotline() {
+        const numNodes = Math.floor(Math.random() * 6) + 3;
+        const xInterval = 670 / (numNodes - 1);
+        const points = [];
+
+        for (let i = 0; i < numNodes; i++) {
+          const yIndex = Math.floor(Math.random() * yLabels.length);
+          points.push({ x: 110 + i * xInterval, y: yLabelPositions[yIndex] });
+        }
+
+        // Randomly decide if the final node should go off the chart
+        const offTheChart = Math.random() < 1 / 6;
+
+        if (offTheChart) {
+          points[points.length - 1].y = 50; // Set the final node's y-coordinate to 50 (above the chart)
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length - 1; i++) {
+          const xc = (points[i].x + points[i + 1].x) / 2;
+          const yc = (points[i].y + points[i + 1].y) / 2;
+          ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+        }
+        ctx.quadraticCurveTo(
+          points[points.length - 1].x,
+          points[points.length - 1].y,
+          points[points.length - 1].x,
+          points[points.length - 1].y
+        );
+        const r = Math.floor(Math.random() * 128);
+        const g = Math.floor(Math.random() * 128);
+        const b = Math.floor(Math.random() * 128);
+        ctx.strokeStyle = `rgb(${r}, ${g}, ${b})`;
+        ctx.lineWidth = Math.floor(Math.random() * 6) + 2;
+        ctx.stroke();
+
+        if (offTheChart) {
+          // Draw the infinity sign
+          ctx.font = "44px Arial";
+          ctx.fillText("∞", points[points.length - 1].x + 0, 40);
+
+          // Draw the "Off the chart happiness" text
+          ctx.font = "16px Arial";
+          ctx.fillText(
+            "Off the chart happiness",
+            points[points.length - 1].x - 100,
+            30
+          );
+        }
+      }
+
+      const infoButton = document.getElementById("infoButton");
+      const infoModal = document.getElementById("infoModal");
+
+      infoButton.addEventListener("click", () => {
+        infoModal.style.display = "block";
+      });
+
+      window.addEventListener("click", (event) => {
+        if (event.target === infoModal) {
+          infoModal.style.display = "none";
+        }
+      });
+
+      document
+        .getElementById("newPlotlineButton")
+        .addEventListener("click", drawGraph);
+
+      // Initial draw
+      drawGraph();
+    </script>
+  </body>
+</html>
