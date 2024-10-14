@@ -1,6 +1,6 @@
 # Story Structure Generator
 
-The EStory Structure Generator is an interactive web application inspired by Kurt Vonnegut's concept of the "Shape of Stories." It generates random plotlines on a graph, showcasing the ups and downs of a story's narrative.
+The Story Structure Generator is an interactive web application inspired by Kurt Vonnegut's concept of the "Shape of Stories." It generates random plotlines on a graph, showcasing the ups and downs of a story's narrative.
 
 Live instance at [https://benjifriedman.github.io/Vonnegut-Story-Structure-Generator/](https://benjifriedman.github.io/Vonnegut-Story-Structure-Generator/)
 
